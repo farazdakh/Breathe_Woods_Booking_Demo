@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#173e36" />
+    <meta name="description" content="Interactive Breathe Woods booking and availability prototype." />
+    <title>Breathe Woods — Booking prototype</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Netlify reads this static form at deploy time. The visible form is rendered by app.js. -->
+    <form name="message-host" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input name="form-name" value="message-host" />
+      <input name="bot-field" />
+      <input name="Guest name" />
+      <input name="Guest email" />
+      <input name="Guest mobile / WhatsApp" />
+      <input name="Requested check-in" />
+      <input name="Requested check-out" />
+      <input name="Enquiry type" />
+      <textarea name="Guest message"></textarea>
+      <input name="Source" />
+    </form>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="wordmark" href="#top" aria-label="Breathe Woods booking prototype">
+          <img class="wordmark-logo" src="breathe-woods-logo.jpg" alt="" />
+          <span>Breathe Woods</span>
+        </a>
+        <div class="demo-pill"><span></span> Interactive booking prototype</div>
+        <button class="text-button" id="resetDemo">Reset demo</button>
+      </header>
+
+      <main id="top">
+        <section class="intro" aria-labelledby="pageTitle">
+          <div>
+            <p class="eyebrow">Bookings · availability · rules</p>
+            <h1 id="pageTitle">A clear way to find your place in the woods.</h1>
+          </div>
+          <p class="intro-copy">Try the booking journey as a guest would. The calendar is seeded with real-world availability examples—not live inventory.</p>
+        </section>
+
+        <section class="booking-workspace" aria-label="Booking prototype">
+          <div class="stepper" aria-label="Booking steps">
+            <div class="step active"><span>1</span><b>Dates</b></div>
+            <div class="step"><span>2</span><b>Stay</b></div>
+            <div class="step"><span>3</span><b>Details</b></div>
+            <div class="step"><span>4</span><b>Review</b></div>
+            <div class="step"><span>5</span><b>Guest & pay</b></div>
+          </div>
+
+          <div class="booking-grid">
+            <section class="calendar-panel" aria-labelledby="calendarTitle">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Step 1 of 5</p>
+                  <h2 id="calendarTitle">When would you like to stay?</h2>
+                </div>
+                <button id="openLegend" class="help-button" aria-label="How availability works">?</button>
+              </div>
+              <div class="date-summary" id="dateSummary" aria-live="polite">Choose your check-in and check-out dates.</div>
+              <div class="calendar-navigation" aria-label="Browse months">
+                <button id="previousMonth" class="month-button" aria-label="Previous month">←</button>
+                <span id="mobileMonthLabel">October 2026</span>
+                <button id="nextMonth" class="month-button" aria-label="Next month">→</button>
+              </div>
+              <div class="calendars" id="calendars"></div>
+              <p class="calendar-note">Up to 12 months ahead. Individual rooms may include Friday/Saturday only on stays of 4 nights or more.</p>
+            </section>
+
+            <aside class="booking-card" aria-label="Your booking">
+              <div class="booking-card-head">
+                <div>
+                  <p class="eyebrow">Your stay</p>
+                  <h2 id="summaryTitle">Start with dates</h2>
+                </div>
+                <span class="mock-label">DEMO</span>
+              </div>
+              <div id="bookingSummary" class="booking-summary">
+                <div class="empty-state">
+                  <span class="empty-icon">⌁</span>
+                  <p>Select dates to see what can be booked.</p>
+                </div>
+              </div>
+              <button id="continueButton" class="primary-button" disabled>Choose a stay <span>→</span></button>
+              <button id="messageHostButton" class="message-host-button">Message host <span>Ask a question or discuss a special stay</span></button>
+              <p class="card-footnote">Demo only — no payment is collected or guest data saved.</p>
+            </aside>
+          </div>
+        </section>
+
+        <section class="availability-strip" aria-labelledby="scenariosTitle">
+          <div>
+            <p class="eyebrow">Seeded test cases</p>
+            <h2 id="scenariosTitle">What to try in this demo</h2>
+          </div>
+          <div class="scenario-list" id="scenarioList"></div>
+        </section>
+
+        <section class="owner-demo-panel" aria-labelledby="ownerPanelTitle">
+          <div class="owner-panel-heading">
+            <div>
+              <p class="eyebrow">Owner-side demonstration</p>
+              <h2 id="ownerPanelTitle">Test the controls behind the booking journey.</h2>
+            </div>
+            <span class="mock-label">DEMO CONTROLS</span>
+          </div>
+          <p class="owner-panel-copy">These are intentionally small, practical controls—not a full revenue-management system. Each change updates the guest-facing calendar and quotation in this prototype.</p>
+          <div class="owner-controls">
+            <div class="control-card">
+              <h3>Weekend room policy</h3>
+              <label class="switch-row"><input id="weekendRoomToggle" type="checkbox"> <span>Allow individual rooms on all dates</span></label>
+              <small id="weekendPolicyHelp">Otherwise rooms need a 4-night stay when Friday or Saturday is included.</small>
+            </div>
+            <div class="control-card rate-control">
+              <h3>Base breakfast tariff</h3>
+              <label>Zen Villa <input id="zenBreakfastRate" type="number" min="0" step="500" value="17000"></label>
+              <label>Bougan’villa <input id="bougBreakfastRate" type="number" min="0" step="500" value="26000"></label>
+            </div>
+            <div class="control-card">
+              <h3>Date-specific offer</h3>
+              <div class="compact-fields"><label>From<input id="offerStart" type="date"></label><label>To<input id="offerEnd" type="date"></label></div>
+              <div class="compact-fields"><label>Discount %<input id="offerPercent" type="number" min="0" max="100" value="10"></label><label>Label<input id="offerLabel" type="text" value="Limited-time offer"></label></div>
+              <button id="applyOffer" class="small-button">Apply offer</button><button id="clearOffer" class="text-button small-text-button">Clear</button>
+            </div>
+            <div class="control-card">
+              <h3>Holiday minimum stay</h3>
+              <div class="compact-fields"><label>From<input id="holidayStart" type="date"></label><label>To<input id="holidayEnd" type="date"></label></div>
+              <button id="applyHoliday" class="small-button">Add 2-night rule</button>
+            </div>
+            <div class="control-card">
+              <h3>Block inventory</h3>
+              <label>What<select id="blockResource"><option value="property">Entire property</option><option value="zen">Zen Villa</option><option value="boug">Bougan’villa</option><option value="zen1">Zen Room 1</option><option value="zen2">Zen Room 2</option><option value="boug1">Bougan’villa Room 1</option><option value="boug2">Bougan’villa Room 2</option><option value="boug3">Bougan’villa Room 3</option></select></label>
+              <div class="compact-fields"><label>From<input id="blockStart" type="date"></label><label>To<input id="blockEnd" type="date"></label></div>
+              <button id="applyBlock" class="small-button">Add owner block</button>
+            </div>
+          </div>
+          <p id="ownerControlStatus" class="owner-control-status" aria-live="polite">Try a control, then revisit the calendar or quote.</p>
+        </section>
+
+        <section class="how-it-works" aria-label="Prototype assumptions">
+          <img src="nature-at-breathe-woods.jpg" alt="Green forested landscape at Breathe Woods" />
+          <p><b>Working assumptions:</b> Zen has 2 rooms and Bougan’villa has 3. On weekdays, rooms can be booked separately and shared spaces are shared. A full-villa booking blocks every room in that villa. An entire-property booking blocks both villas. These remain owner-confirmation items.</p>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="availabilityDialog" class="dialog">
+      <button class="dialog-close" id="closeLegend" aria-label="Close">×</button>
+      <p class="eyebrow">Calendar key</p>
+      <h2>Availability is calculated per stay, not merely per day.</h2>
+      <ul class="legend-list">
+        <li><span class="legend-dot available"></span> Available to start a stay</li>
+        <li><span class="legend-dot limited"></span> Some rooms remain, but a private villa is not available</li>
+        <li><span class="legend-dot blocked"></span> Sold, owner-blocked, or unavailable</li>
+      </ul>
+      <p>Choose dates first. The next step shows only accommodation that remains available for the entire stay.</p>
+    </dialog>
+
+    <dialog id="stayDialog" class="dialog wide-dialog">
+      <button class="dialog-close" data-close-dialog aria-label="Close">×</button>
+      <div id="stayDialogContent"></div>
+    </dialog>
+
+    <dialog id="detailsDialog" class="dialog wide-dialog">
+      <button class="dialog-close" data-close-dialog aria-label="Close">×</button>
+      <div id="detailsDialogContent"></div>
+    </dialog>
+
+    <dialog id="reviewDialog" class="dialog wide-dialog">
+      <button class="dialog-close" data-close-dialog aria-label="Close">×</button>
+      <div id="reviewDialogContent"></div>
+    </dialog>
+
+    <dialog id="guestDialog" class="dialog wide-dialog">
+      <button class="dialog-close" data-close-dialog aria-label="Close">×</button>
+      <div id="guestDialogContent"></div>
+    </dialog>
+
+    <dialog id="paymentDialog" class="dialog payment-dialog">
+      <button class="dialog-close" data-close-dialog aria-label="Close">×</button>
+      <div id="paymentDialogContent"></div>
+    </dialog>
+
+    <dialog id="messageHostDialog" class="dialog host-message-dialog">
+      <button class="dialog-close" data-close-dialog aria-label="Close">×</button>
+      <div id="messageHostDialogContent"></div>
+    </dialog>
+    <script src="app.js"></script>
+  </body>
+</html>
